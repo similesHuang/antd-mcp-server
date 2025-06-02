@@ -22,6 +22,6 @@ export const parseMDMatter = async (filePath: string): Promise<AntdMDMatter | un
 
     return file.data.matter as AntdMDMatter;
   } catch (error) {
-    return undefined
+    return undefined;
   }
 };

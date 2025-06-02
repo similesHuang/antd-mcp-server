@@ -15,7 +15,7 @@ const registryTool = (server: McpServer) => {
           {
             type: "text",
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            text: `以下是可用的组件：${JSON.stringify(components.map(({dirName, ...restProps }) => restProps))}`,
+            text: `以下是可用的组件：${JSON.stringify(components.map(({ dirName, ...restProps }) => restProps))}`,
           },
         ],
       };

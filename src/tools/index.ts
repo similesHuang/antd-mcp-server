@@ -1,4 +1,4 @@
-import type{ McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 import getComponentDocs from "./get-component-docs.js";
 import listComponentExamples from "./list-component-examples.js";

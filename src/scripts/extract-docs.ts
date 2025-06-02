@@ -89,23 +89,19 @@ export interface MetaDataResult {
 const extractExamples = (markdown: string) => {
   // 获取文档中的代码示例及其描述
   const codeRefs = [
-    ...markdown.matchAll(
-      /<code src="\.\/demo\/([^"]+)\.tsx"(?:\s+[^>]*)?>(.*?)<\/code>/g
-    ),
+    ...markdown.matchAll(/<code src="\.\/demo\/([^"]+)\.tsx"(?:\s+[^>]*)?>(.*?)<\/code>/g),
   ];
 
   if (codeRefs && codeRefs.length > 0) {
     return codeRefs
-      .filter(
-        (match) => !match[1].startsWith("debug-") && !match[1].startsWith("_")
-      )
+      .filter((match) => !match[1].startsWith("debug-") && !match[1].startsWith("_"))
       .map(
         (match): ExampleInfoList => ({
           name: match[1],
           title: match[2]?.trim() || match[1], // 如果没有描述标题，则使用示例名称
           description: "",
           code: "",
-        })
+        }),
       );
   }
 
@@ -171,9 +167,7 @@ async function processComponent(componentsPath: string, dirName: string) {
     // 读取并解析文档
     const docContent = await readFile(indexMdPath, "utf-8");
     const mdMatter = await parseMDMatter(indexMdPath);
-    componentData.validVersion = mdMatter?.tag
-      ? `自 ${mdMatter?.tag} 起支持`
-      : undefined;
+    componentData.validVersion = mdMatter?.tag ? `自 ${mdMatter?.tag} 起支持` : undefined;
     componentData.description = mdMatter?.description;
 
     const initHandleDoc = (doc: string) => {
@@ -195,10 +189,10 @@ async function processComponent(componentsPath: string, dirName: string) {
     // 从文档中提取示例及其描述
     componentData.exampleInfoList = extractExamples(handleDocResult);
 
-    componentData.documentation = removeSection(
-      handleDocResult,
-      "\n## 代码演示"
-    ).replace(DOC_CLEANUP_EMPTY_LINE, "\n");
+    componentData.documentation = removeSection(handleDocResult, "\n## 代码演示").replace(
+      DOC_CLEANUP_EMPTY_LINE,
+      "\n",
+    );
 
     // 从演示目录中读取示例文件
     if (existsSync(demoPath) && componentData.exampleInfoList) {
@@ -208,27 +202,22 @@ async function processComponent(componentsPath: string, dirName: string) {
         const examplePath = join(demoPath, exampleInfo.name);
 
         try {
-          exampleInfo.description = await readFile(
-            `${examplePath}.md`,
-            "utf-8"
-          ).then((content) =>
+          exampleInfo.description = await readFile(`${examplePath}.md`, "utf-8").then((content) =>
             removeSection(content, "\n## en-US")
               .replace(/## zh-CN/g, "")
-              .replace(DOC_CLEANUP_EMPTY_LINE, "\n")
+              .replace(DOC_CLEANUP_EMPTY_LINE, "\n"),
           );
         } catch (error) {
-          console.log(error)
+          console.log(error);
         }
 
         try {
-          exampleInfo.code = (
-            await readFile(`${examplePath}.tsx`, "utf-8")
-          ).replace(DOC_CLEANUP_EMPTY_LINE, "\n");
-        } catch (error) {
-          console.error(
-            `  ❌ 读取示例 ${exampleInfo.name} 时出错:`,
-            (error as Error).message
+          exampleInfo.code = (await readFile(`${examplePath}.tsx`, "utf-8")).replace(
+            DOC_CLEANUP_EMPTY_LINE,
+            "\n",
           );
+        } catch (error) {
+          console.error(`  ❌ 读取示例 ${exampleInfo.name} 时出错:`, (error as Error).message);
         }
       }
 
@@ -237,10 +226,7 @@ async function processComponent(componentsPath: string, dirName: string) {
 
     return componentData;
   } catch (error) {
-    console.error(
-      `  ❌ 处理 ${componentName} 时出错:`,
-      (error as Error).message
-    );
+    console.error(`  ❌ 处理 ${componentName} 时出错:`, (error as Error).message);
     return null;
   }
 }
@@ -258,36 +244,28 @@ async function extractAllData(antdRepoPath: string) {
     antdRepoPath,
     ".dumi",
     "preset",
-    EXTRACT_COMPONENTS_CHANGELOG_PATH
+    EXTRACT_COMPONENTS_CHANGELOG_PATH,
   );
 
   console.log(`🔍 从 ${componentsPath} 抓取文档信息`);
 
   if (!existsSync(componentsPath)) {
-    console.error(
-      `❌ 错误: 未找到 ${componentsPath} 目录，请传入正确的 Ant Design 目录。`
-    );
+    console.error(`❌ 错误: 未找到 ${componentsPath} 目录，请传入正确的 Ant Design 目录。`);
     process.exit(1);
   }
 
   if (!existsSync(antDPackageJsonPath)) {
     console.error(
-      `❌ 提取 changelog 错误: 未找到 ${antDPackageJsonPath} 文件，请进入正确的 Ant Design 目录并执行 npm run lint:changelog 脚本`
+      `❌ 提取 changelog 错误: 未找到 ${antDPackageJsonPath} 文件，请进入正确的 Ant Design 目录并执行 npm run lint:changelog 脚本`,
     );
   } else {
     try {
       await writeJsonFile(
         EXTRACTED_COMPONENTS_DATA_CHANGELOG_PATH,
-        await readFile(antDChangelogPath, "utf-8").then((content) =>
-          JSON.parse(content)
-        )
+        await readFile(antDChangelogPath, "utf-8").then((content) => JSON.parse(content)),
       );
     } catch (error) {
-      console.error(
-        `  ❌ 写入 changelog 错误:`,
-        (error as Error).message,
-        "使用内置的更新日志"
-      );
+      console.error(`  ❌ 写入 changelog 错误:`, (error as Error).message, "使用内置的更新日志");
     }
   }
 
@@ -303,7 +281,7 @@ async function extractAllData(antdRepoPath: string) {
       !entry.name.startsWith("_") &&
       entry.name !== "locale" &&
       entry.name !== "style" &&
-      entry.name !== "version"
+      entry.name !== "version",
   );
 
   console.log(`🙈 共找到 ${componentDirs.length} 个潜在组件\n`);
@@ -320,9 +298,7 @@ async function extractAllData(antdRepoPath: string) {
     }
   }
 
-  console.log(
-    `✅ 成功处理了 ${processedCount} 个组件，共 ${componentDirs.length} 个`
-  );
+  console.log(`✅ 成功处理了 ${processedCount} 个组件，共 ${componentDirs.length} 个`);
 
   /** 提取数据的操作结果 */
   const metaDataResult: MetaDataResult = {
@@ -343,7 +319,7 @@ async function extractAllData(antdRepoPath: string) {
       validVersion,
       description,
       whenToUse,
-    })
+    }),
   );
 
   await writeJsonFile(EXTRACTED_COMPONENTS_LIST_PATH, componentsIndex);
@@ -358,17 +334,11 @@ async function extractAllData(antdRepoPath: string) {
   // 将组件数据写入对应目录
   for (const componentData of Object.values(componentDataMap)) {
     /** 组件内容目录 */
-    const componentDir = join(
-      EXTRACTED_COMPONENTS_DATA_PATH,
-      componentData.dirName
-    );
+    const componentDir = join(EXTRACTED_COMPONENTS_DATA_PATH, componentData.dirName);
     await mkdir(componentDir, { recursive: true });
 
     // 写入文档
-    await writeFile(
-      join(componentDir, DOC_FILE_NAME),
-      componentData.documentation
-    );
+    await writeFile(join(componentDir, DOC_FILE_NAME), componentData.documentation);
 
     // 写入示例
     // 创建带有示例描述的markdown文件
